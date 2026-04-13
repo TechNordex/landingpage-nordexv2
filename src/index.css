@@ -90,3 +90,36 @@ body {
   pointer-events: none;
   opacity: 0.04;
 }
+
+@keyframes nordyHeroFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -6px, 0); }
+}
+
+@keyframes nordyHeroGlowPulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.98); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+.nordy-hero-glow {
+  background: radial-gradient(circle, rgba(245, 197, 24, 0.22) 0%, rgba(245, 197, 24, 0.08) 38%, transparent 74%);
+  filter: blur(28px);
+  animation: nordyHeroGlowPulse 5s ease-in-out infinite;
+}
+
+.nordy-hero-chip {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  animation: nordyHeroFloat 5.6s ease-in-out infinite;
+}
+
+.nordy-hero-chip:nth-of-type(2) {
+  animation-delay: 0.4s;
+}
+
+.nordy-hero-chip:nth-of-type(3) {
+  animation-delay: 0.8s;
+}
+
+.nordy-hero-chip:nth-of-type(4) {
+  animation-delay: 1.2s;
+}

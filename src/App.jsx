@@ -17,6 +17,20 @@ export default function App() {
   const appRef = useRef(null)
 
   useEffect(() => {
+    if (!splashDone || window.location.hash) return
+
+    // Run after the splash unmounts so the browser cannot restore
+    // a stale position into the sticky Nordy section on plain reloads.
+    const id = requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+    })
+
+    return () => cancelAnimationFrame(id)
+  }, [splashDone])
+
+  useEffect(() => {
     if (!splashDone || !appRef.current) return
 
     animate(appRef.current, {
@@ -38,7 +52,7 @@ export default function App() {
         }}
       >
         <Navbar />
-        <main>
+        <main className="pt-20 md:pt-24">
           <Hero />
           <ProductDemo />
           <Clients />

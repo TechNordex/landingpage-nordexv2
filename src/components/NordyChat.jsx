@@ -47,6 +47,18 @@ export default function NordyChat() {
     if (open) setPulse(false)
   }, [open])
 
+  // Listen for external open trigger (e.g. from NordySection hint)
+  useEffect(() => {
+    const handler = () => {
+      if (!open) {
+        setOpening(true)
+        setOpen(true)
+      }
+    }
+    window.addEventListener('nordy:open', handler)
+    return () => window.removeEventListener('nordy:open', handler)
+  }, [open])
+
   // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })

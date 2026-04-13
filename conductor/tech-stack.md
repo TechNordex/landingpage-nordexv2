@@ -23,6 +23,13 @@
 - `npm run server`: sobe apenas o backend
 - `npm run build`: build do frontend
 - `npm run preview`: preview do build
+- `npm test`: executa a suíte de componentes React com Vitest
+
+## Testes
+
+- Frontend component tests: Vitest + Testing Library + jsdom
+- `npm test`: executa a suíte de componentes React
+- `npm run build`: valida o bundle final da landing
 
 ## Desenvolvimento em rede local
 
@@ -55,7 +62,7 @@
 
 ## Débitos e riscos atuais
 
-- Ausência de testes automatizados
+- A cobertura automatizada ainda está concentrada na UI do Nordy e não cobre o backend
 - Contexto do produto e workflow ainda estava fora de uma estrutura única
 - O backend depende de serviços externos para funções críticas de contato e chat
 
