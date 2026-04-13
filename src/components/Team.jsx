@@ -9,7 +9,7 @@ const team = [
     bio: 'Arquiteto de Software e desenvolvedor Fullcycle. Responsável pelo ciclo de vida completo das aplicações e na tradução de necessidades de negócio em soluções técnicas.',
     tags: ['Arquitetura', 'Fullcycle', 'Backend'],
     color: '#F5C518',
-    linkedin: '#',
+    linkedin: 'https://www.linkedin.com/in/devmontenegro/',
   },
   {
     initials: 'DS',
@@ -18,7 +18,7 @@ const team = [
     bio: 'Especialista em Inteligência Artificial e automação de fluxos. Responsável pela persistência, modelagem e integridade de dados das aplicações.',
     tags: ['IA', 'Automação', 'Dados'],
     color: '#FFD93D',
-    linkedin: '#',
+    linkedin: 'https://www.linkedin.com/in/deyvid-silva-490aa31b5/',
   },
   {
     initials: 'AV',
@@ -27,7 +27,7 @@ const team = [
     bio: 'Gestor de Operações, Cloud e orquestração de serviços de deploy. Garante a alta disponibilidade, performance de rede e segurança da infraestrutura.',
     tags: ['Cloud', 'DevOps', 'Infra'],
     color: '#D4A017',
-    linkedin: '#',
+    linkedin: 'https://www.linkedin.com/in/adson-vicente-40968b352/',
   },
 ]
 
@@ -74,6 +74,8 @@ export default function Team() {
                 </div>
                 <a
                   href={member.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={`LinkedIn de ${member.name}`}
                   className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-white/40 hover:text-brand-yellow hover:border-brand-yellow/30 transition-all duration-200 cursor-pointer"
                 >

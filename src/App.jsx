@@ -8,6 +8,8 @@ import AboutUs from './components/AboutUs'
 import Team from './components/Team'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import Clients from './components/Clients'
+import NordyChat from './components/NordyChat'
 
 export default function App() {
   const [splashDone, setSplashDone] = useState(false)
@@ -26,12 +28,14 @@ export default function App() {
         <main>
           <Hero />
           <ProductDemo />
+          <Clients />
           <NordySection />
           <AboutUs />
           <Team />
           <Contact />
         </main>
         <Footer />
+        <NordyChat />
       </div>
     </>
   )

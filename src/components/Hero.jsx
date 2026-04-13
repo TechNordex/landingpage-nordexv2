@@ -392,9 +392,9 @@ export default function Hero() {
           style={{ animationDelay: '700ms' }}
         >
           {[
-            { value: '3+', label: 'Anos de mercado' },
-            { value: '100%', label: 'Comprometimento' },
-            { value: 'NE', label: 'Raízes no Nordeste' },
+            { value: '2', label: 'Projetos em produção' },
+            { value: '24/7', label: 'Suporte e disponibilidade' },
+            { value: 'NE', label: 'Feito no Nordeste' },
           ].map((s) => (
             <div key={s.label} className="flex flex-col items-center gap-1">
               <span className="font-heading font-bold text-2xl text-brand-yellow">{s.value}</span>

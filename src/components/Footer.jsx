@@ -2,8 +2,17 @@ import { MapPin } from 'lucide-react'
 import logo from '../../nordex.jpeg'
 
 const links = {
-  Empresa: ['Quem Somos', 'Time', 'Contato'],
-  Soluções: ['Sistemas Web', 'Apps Mobile', 'IA & Automação', 'Cloud & Infra'],
+  Empresa: [
+    { label: 'Quem Somos', href: '#about' },
+    { label: 'Time', href: '#team' },
+    { label: 'Contato', href: '#contact' },
+  ],
+  Soluções: [
+    { label: 'Sistemas Web', href: '#products' },
+    { label: 'Apps Mobile', href: '#products' },
+    { label: 'IA & Automação', href: '#products' },
+    { label: 'Cloud & Infra', href: '#products' },
+  ],
 }
 
 export default function Footer() {
@@ -34,12 +43,12 @@ export default function Footer() {
               <p className="font-heading font-semibold text-white text-sm mb-4">{title}</p>
               <ul className="space-y-3">
                 {items.map((item) => (
-                  <li key={item}>
+                  <li key={item.label}>
                     <a
-                      href="#"
+                      href={item.href}
                       className="font-body text-sm text-white/40 hover:text-brand-yellow transition-colors duration-200 cursor-pointer"
                     >
-                      {item}
+                      {item.label}
                     </a>
                   </li>
                 ))}
