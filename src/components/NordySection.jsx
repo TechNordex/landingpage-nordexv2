@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { animate, stagger } from 'animejs'
 import {
   MessageCircle,
   Send,
@@ -62,7 +63,7 @@ function ChatMock({ channel }) {
   const color = colors[channel]
 
   return (
-    <div className="w-full max-w-xs mx-auto bg-brand-gray-mid rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+    <div className="w-full max-w-xs md:max-w-sm mx-auto bg-brand-gray-mid rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
       {/* header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-white/8" style={{ background: `${color}18` }}>
         <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: `${color}30` }}>
@@ -79,7 +80,7 @@ function ChatMock({ channel }) {
         </div>
       </div>
       {/* messages */}
-      <div className="p-3 space-y-2 min-h-44 flex flex-col justify-end">
+      <div className="p-3 md:p-4 space-y-2 min-h-44 md:min-h-56 flex flex-col justify-end">
         {msgs.slice(0, step).map((m, i) => (
           <div
             key={i}
@@ -137,7 +138,7 @@ const segments = [
 
 // ── Features ─────────────────────────────────────────────────
 const features = [
-  { icon: Users, title: 'Assistentes sob medida', desc: 'Um para vendas, outro para suporte, mais um para o jurídico — cada assistente fala a linguagem do setor.' },
+  { icon: Users, title: 'Assistentes sob medida', desc: 'Um para vendas, outro para suporte, mais um para o jurídico. Cada assistente fala a linguagem do setor.' },
   { icon: BookOpen, title: 'Ensine em minutos', desc: 'Basta enviar seus materiais ou escrever as instruções. O Nordy aprende rapidinho.' },
   { icon: MessageCircle, title: 'WhatsApp sem complicação', desc: 'Conecte seu número e pronto: seus clientes são atendidos na hora, 24h por dia.' },
   { icon: Send, title: 'Telegram integrado', desc: 'Se sua equipe ou clientes usam Telegram, o Nordy também está lá com a mesma inteligência.' },
@@ -157,13 +158,15 @@ const stats = [
 const PANEL_LABELS = ['Introdução', 'Funcionalidades', 'Integrações', 'Segmentos']
 
 export default function NordySection() {
+  const sectionRef = useRef(null)
   const outerRef = useRef(null)
   const trackRef = useRef(null)
+  const chatShellRef = useRef(null)
+  const animatedPanelsRef = useRef(new Set())
   const [activeChannel, setActiveChannel] = useState('whatsapp')
   const [activePanel, setActivePanel] = useState(0)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
   const channels = ['whatsapp', 'telegram', 'site']
-
   // Detect mobile
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -219,32 +222,88 @@ export default function NordySection() {
     }
   }, [isMobile])
 
+  useEffect(() => {
+    const shell = chatShellRef.current
+    if (!shell) return
+
+    animate(shell, {
+      opacity: [0, 1],
+      y: ['1rem', 0],
+      scale: [0.985, 1],
+      duration: 450,
+      ease: 'out(3)',
+    })
+  }, [activeChannel, isMobile])
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const animatePanel = (panelIndex) => {
+      const panel = section.querySelector(`[data-nordy-panel="${panelIndex}"]`)
+      if (!panel || animatedPanelsRef.current.has(panelIndex)) return
+
+      const items = panel.querySelectorAll('[data-nordy-item]')
+      if (!items.length) return
+
+      animatedPanelsRef.current.add(panelIndex)
+
+      animate(items, {
+        opacity: [0, 1],
+        y: ['1.5rem', 0],
+        scale: [0.985, 1],
+        delay: stagger(90, { ease: 'out(2)' }),
+        duration: 650,
+        ease: 'out(3)',
+      })
+    }
+
+    if (isMobile) {
+      const panels = section.querySelectorAll('[data-nordy-panel]')
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return
+            animatePanel(entry.target.getAttribute('data-nordy-panel'))
+          })
+        },
+        { threshold: 0.2 }
+      )
+
+      panels.forEach((panel) => observer.observe(panel))
+      return () => observer.disconnect()
+    }
+
+    animatePanel(String(activePanel))
+  }, [activePanel, isMobile])
+
   if (isMobile) {
     return (
-      <section id="nordy" aria-label="Nordy — Assistente de atendimento" className="bg-brand-black">
+      <section ref={sectionRef} id="nordy" aria-label="Nordy — Assistente de atendimento" className="bg-brand-black">
         {/* ── MOBILE: vertical stacked panels ── */}
 
         {/* Panel 1 — Intro */}
-        <div className="px-5 py-16 relative overflow-hidden">
+        <div data-nordy-panel="0" className="px-5 py-16 relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{
             background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(245,197,24,0.07) 0%, transparent 70%)'
           }} />
           <div className="relative">
-            <div className="inline-flex items-center gap-2 bg-brand-yellow/10 border border-brand-yellow/30 rounded-full px-4 py-1.5 mb-6">
+            <div data-nordy-item className="inline-flex items-center gap-2 bg-brand-yellow/10 border border-brand-yellow/30 rounded-full px-4 py-1.5 mb-6">
               <span className="w-2 h-2 rounded-full bg-brand-yellow animate-pulse" />
-              <span className="font-body text-xs text-brand-yellow tracking-wide uppercase">Produto em destaque</span>
+              <span className="font-body text-xs text-brand-yellow tracking-wide uppercase">Conheça o Nordy</span>
             </div>
-            <h2 className="font-heading font-bold leading-none mb-3" style={{ fontSize: 'clamp(3rem, 16vw, 5rem)' }}>
+            <h2 data-nordy-item className="font-heading font-bold leading-none mb-3" style={{ fontSize: 'clamp(3rem, 16vw, 5rem)' }}>
               <span className="gradient-text">Nordy</span>
             </h2>
-            <p className="font-heading font-semibold text-white text-xl mb-3 leading-snug">
+            <p data-nordy-item className="font-heading font-semibold text-white text-xl mb-3 leading-snug">
               Seu assistente de atendimento
             </p>
-            <p className="font-body text-white/55 text-base leading-relaxed mb-8">
+            <p data-nordy-item className="font-body text-white/55 text-base leading-relaxed mb-8">
               Um atendente incansável que conhece seu negócio, responde seus clientes no
-              WhatsApp, Telegram e site — 24 horas por dia, 7 dias por semana.
+              WhatsApp, Telegram e site, 24 horas por dia, 7 dias por semana.
             </p>
             <a
+              data-nordy-item
               href="#contact"
               className="group inline-flex items-center gap-2 bg-brand-yellow text-brand-black font-heading font-bold px-6 py-3.5 rounded-full hover:bg-brand-yellow-light transition-all duration-200 cursor-pointer yellow-glow"
             >
@@ -255,7 +314,7 @@ export default function NordySection() {
               {stats.map((s) => {
                 const Icon = s.icon
                 return (
-                  <div key={s.label} className="bg-brand-gray-mid border border-white/8 rounded-2xl p-4">
+                  <div data-nordy-item key={s.label} className="bg-brand-gray-mid border border-white/8 rounded-2xl p-4">
                     <div className="w-8 h-8 rounded-xl bg-brand-yellow/10 flex items-center justify-center mb-3">
                       <Icon size={16} className="text-brand-yellow" />
                     </div>
@@ -269,20 +328,20 @@ export default function NordySection() {
         </div>
 
         {/* Panel 2 — Features */}
-        <div className="px-5 py-14 border-t border-white/8">
-          <p className="font-body text-brand-yellow text-xs uppercase tracking-widest mb-2">O que o Nordy faz</p>
-          <h2 className="font-heading font-bold text-white text-2xl leading-tight mb-2">
+        <div data-nordy-panel="1" className="px-5 py-14 border-t border-white/8">
+          <p data-nordy-item className="font-body text-brand-yellow text-xs uppercase tracking-widest mb-2">O que o Nordy faz</p>
+          <h2 data-nordy-item className="font-heading font-bold text-white text-2xl leading-tight mb-2">
             Menos trabalho repetitivo.{' '}
             <span className="gradient-text">Mais tempo para o que importa.</span>
           </h2>
-          <p className="font-body text-white/50 text-sm leading-relaxed mb-8">
+          <p data-nordy-item className="font-body text-white/50 text-sm leading-relaxed mb-8">
             O Nordy cuida do atendimento para que você e sua equipe possam focar no crescimento.
           </p>
           <div className="grid grid-cols-1 gap-3">
             {features.map((f) => {
               const Icon = f.icon
               return (
-                <div key={f.title} className="bg-brand-gray-mid border border-white/8 rounded-2xl p-4 flex gap-4">
+                <div data-nordy-item key={f.title} className="bg-brand-gray-mid border border-white/8 rounded-2xl p-4 flex gap-4">
                   <div className="w-10 h-10 rounded-xl bg-brand-yellow/10 flex items-center justify-center flex-shrink-0">
                     <Icon size={18} className="text-brand-yellow" />
                   </div>
@@ -297,13 +356,13 @@ export default function NordySection() {
         </div>
 
         {/* Panel 3 — Integrations */}
-        <div className="px-5 py-14 border-t border-white/8">
-          <p className="font-body text-brand-yellow text-xs uppercase tracking-widest mb-2">Integrações</p>
-          <h2 className="font-heading font-bold text-white text-2xl leading-tight mb-8">
+        <div data-nordy-panel="2" className="px-5 py-14 border-t border-white/8">
+          <p data-nordy-item className="font-body text-brand-yellow text-xs uppercase tracking-widest mb-2">Integrações</p>
+          <h2 data-nordy-item className="font-heading font-bold text-white text-2xl leading-tight mb-8">
             Onde seus clientes estiverem,{' '}
             <span className="gradient-text">o Nordy está</span>
           </h2>
-          <div className="flex flex-col gap-3 mb-8">
+          <div data-nordy-item className="flex flex-col gap-3 mb-8">
             {[
               { label: 'WhatsApp', color: '#25D366', key: 'whatsapp', icon: MessageCircle },
               { label: 'Telegram', color: '#2AABEE', key: 'telegram', icon: Send },
@@ -333,13 +392,15 @@ export default function NordySection() {
               )
             })}
           </div>
-          <ChatMock key={activeChannel} channel={activeChannel} />
+          <div ref={chatShellRef} data-nordy-item>
+            <ChatMock key={activeChannel} channel={activeChannel} />
+          </div>
         </div>
 
         {/* Panel 4 — Segments + CTA */}
-        <div className="px-5 py-14 border-t border-white/8">
-          <p className="font-body text-brand-yellow text-xs uppercase tracking-widest mb-2">Feito para o seu negócio</p>
-          <h2 className="font-heading font-bold text-white text-2xl leading-tight mb-8">
+        <div data-nordy-panel="3" className="px-5 py-14 border-t border-white/8">
+          <p data-nordy-item className="font-body text-brand-yellow text-xs uppercase tracking-widest mb-2">Feito para o seu negócio</p>
+          <h2 data-nordy-item className="font-heading font-bold text-white text-2xl leading-tight mb-8">
             Não importa o segmento,{' '}
             <span className="gradient-text">o Nordy se adapta</span>
           </h2>
@@ -347,7 +408,7 @@ export default function NordySection() {
             {segments.map((s) => {
               const Icon = s.icon
               return (
-                <div key={s.label} className="bg-brand-gray-mid border border-white/8 rounded-2xl p-4 text-center hover:border-brand-yellow/30 transition-all duration-300">
+                <div data-nordy-item key={s.label} className="bg-brand-gray-mid border border-white/8 rounded-2xl p-4 text-center hover:border-brand-yellow/30 transition-all duration-300">
                   <div className="w-10 h-10 rounded-xl bg-brand-yellow/10 flex items-center justify-center mx-auto mb-2">
                     <Icon size={18} className="text-brand-yellow" />
                   </div>
@@ -357,7 +418,7 @@ export default function NordySection() {
               )
             })}
           </div>
-          <div className="bg-brand-gray-mid border border-brand-yellow/20 rounded-3xl p-6 yellow-glow">
+          <div data-nordy-item className="bg-brand-gray-mid border border-brand-yellow/20 rounded-3xl p-6 yellow-glow">
             <h3 className="font-heading font-bold text-white text-lg mb-1">
               Pronto para ter o Nordy no seu negócio?
             </h3>
@@ -391,7 +452,7 @@ export default function NordySection() {
   }
 
   return (
-    <section id="nordy" aria-label="Nordy — Assistente de atendimento">
+    <section ref={sectionRef} id="nordy" aria-label="Nordy — Assistente de atendimento">
       {/* Outer: (PANELS - 1) extra viewports of scroll space + 1 viewport for the panel itself */}
       <div
         ref={outerRef}
@@ -429,7 +490,7 @@ export default function NordySection() {
           >
 
             {/* ── PANEL 1 — Intro ─────────────────────────── */}
-            <div className="w-screen h-full flex-shrink-0 flex items-center justify-center relative overflow-hidden px-6">
+            <div data-nordy-panel="0" className="w-screen h-full flex-shrink-0 flex items-center justify-center relative overflow-hidden px-6">
               {/* bg accent */}
               <div className="absolute inset-0 pointer-events-none" style={{
                 background: 'radial-gradient(ellipse 60% 60% at 60% 50%, rgba(245,197,24,0.07) 0%, transparent 70%)'
@@ -440,22 +501,23 @@ export default function NordySection() {
                 {/* Left */}
                 <div>
                   {/* Badge */}
-                  <div className="inline-flex items-center gap-2 bg-brand-yellow/10 border border-brand-yellow/30 rounded-full px-4 py-1.5 mb-6">
+                  <div data-nordy-item className="inline-flex items-center gap-2 bg-brand-yellow/10 border border-brand-yellow/30 rounded-full px-4 py-1.5 mb-6">
                     <span className="w-2 h-2 rounded-full bg-brand-yellow animate-pulse" />
-                    <span className="font-body text-xs text-brand-yellow tracking-wide uppercase">Produto em destaque</span>
+                    <span className="font-body text-xs text-brand-yellow tracking-wide uppercase">Conheça o Nordy</span>
                   </div>
 
-                  <h2 className="font-heading font-bold leading-none mb-4" style={{ fontSize: 'clamp(3rem, 6vw, 6rem)' }}>
+                  <h2 data-nordy-item className="font-heading font-bold leading-none mb-4" style={{ fontSize: 'clamp(3rem, 6vw, 6rem)' }}>
                     <span className="gradient-text">Nordy</span>
                   </h2>
-                  <p className="font-heading font-semibold text-white text-2xl mb-4 leading-snug">
+                  <p data-nordy-item className="font-heading font-semibold text-white text-2xl mb-4 leading-snug">
                     Seu assistente de<br />atendimento
                   </p>
-                  <p className="font-body text-white/55 text-lg leading-relaxed max-w-md mb-8">
+                  <p data-nordy-item className="font-body text-white/55 text-lg leading-relaxed max-w-md mb-8">
                     Um atendente incansável que conhece seu negócio, responde seus clientes no
-                    WhatsApp, Telegram e site — 24 horas por dia, 7 dias por semana, sem precisar de férias.
+                    WhatsApp, Telegram e site, 24 horas por dia, 7 dias por semana, sem precisar de férias.
                   </p>
                   <a
+                    data-nordy-item
                     href="#contact"
                     className="group inline-flex items-center gap-2 bg-brand-yellow text-brand-black font-heading font-bold px-7 py-4 rounded-full hover:bg-brand-yellow-light transition-all duration-200 cursor-pointer hover:scale-105 yellow-glow"
                   >
@@ -470,6 +532,7 @@ export default function NordySection() {
                     const Icon = s.icon
                     return (
                       <div
+                        data-nordy-item
                         key={s.label}
                         className="bg-brand-gray-mid border border-white/8 rounded-2xl p-6 hover:border-brand-yellow/30 transition-all duration-300 group"
                       >
@@ -487,16 +550,16 @@ export default function NordySection() {
             </div>
 
             {/* ── PANEL 2 — Features ──────────────────────── */}
-            <div className="w-screen h-full flex-shrink-0 flex items-center justify-center px-6 relative">
+            <div data-nordy-panel="1" className="w-screen h-full flex-shrink-0 flex items-center justify-center px-6 relative">
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-yellow/15 to-transparent" />
               <div className="max-w-6xl w-full mx-auto">
                 <div className="mb-12">
-                  <p className="font-body text-brand-yellow text-sm uppercase tracking-widest mb-3">O que o Nordy faz</p>
-                  <h2 className="font-heading font-bold text-white leading-tight mb-3" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 3rem)' }}>
+                  <p data-nordy-item className="font-body text-brand-yellow text-sm uppercase tracking-widest mb-3">O que o Nordy faz</p>
+                  <h2 data-nordy-item className="font-heading font-bold text-white leading-tight mb-3" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 3rem)' }}>
                     Menos trabalho repetitivo.<br />
                     <span className="gradient-text">Mais tempo para o que importa.</span>
                   </h2>
-                  <p className="font-body text-white/50 max-w-lg text-base leading-relaxed">
+                  <p data-nordy-item className="font-body text-white/50 max-w-lg text-base leading-relaxed">
                     O Nordy cuida do atendimento para que você e sua equipe possam focar no crescimento do negócio.
                   </p>
                 </div>
@@ -505,6 +568,7 @@ export default function NordySection() {
                     const Icon = f.icon
                     return (
                       <div
+                        data-nordy-item
                         key={f.title}
                         className="group bg-brand-gray-mid border border-white/8 rounded-2xl p-5 hover:border-brand-yellow/30 transition-all duration-300"
                       >
@@ -521,17 +585,17 @@ export default function NordySection() {
             </div>
 
             {/* ── PANEL 3 — Integrations chat mock ────────── */}
-            <div className="w-screen h-full flex-shrink-0 flex items-center justify-center px-6 relative">
+            <div data-nordy-panel="2" className="w-screen h-full flex-shrink-0 flex items-center justify-center px-6 relative">
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-yellow/15 to-transparent" />
               <div className="max-w-6xl w-full mx-auto grid lg:grid-cols-2 gap-16 items-center">
                 {/* Left text */}
                 <div>
-                  <p className="font-body text-brand-yellow text-sm uppercase tracking-widest mb-3">Integrações</p>
-                  <h2 className="font-heading font-bold text-white leading-tight mb-6" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 3rem)' }}>
+                  <p data-nordy-item className="font-body text-brand-yellow text-sm uppercase tracking-widest mb-3">Integrações</p>
+                  <h2 data-nordy-item className="font-heading font-bold text-white leading-tight mb-6" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 3rem)' }}>
                     Onde seus clientes<br />
                     <span className="gradient-text">estiverem, o Nordy está</span>
                   </h2>
-                  <div className="flex flex-col gap-3 mb-8">
+                  <div data-nordy-item className="flex flex-col gap-3 mb-8">
                     {[
                       { label: 'WhatsApp', color: '#25D366', key: 'whatsapp', icon: MessageCircle },
                       { label: 'Telegram', color: '#2AABEE', key: 'telegram', icon: Send },
@@ -572,8 +636,8 @@ export default function NordySection() {
                 </div>
 
                 {/* Right: animated chat */}
-                <div className="flex justify-center lg:justify-end">
-                  <div style={{ width: 320 }}>
+                <div data-nordy-item className="flex justify-center lg:justify-end">
+                  <div ref={chatShellRef} style={{ width: 360 }}>
                     <ChatMock key={activeChannel} channel={activeChannel} />
                   </div>
                 </div>
@@ -581,7 +645,7 @@ export default function NordySection() {
             </div>
 
             {/* ── PANEL 4 — Segments + CTA ────────────────── */}
-            <div className="w-screen h-full flex-shrink-0 flex items-center justify-center px-6 relative overflow-hidden">
+            <div data-nordy-panel="3" className="w-screen h-full flex-shrink-0 flex items-center justify-center px-6 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-yellow/15 to-transparent" />
               <div
                 className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[600px] h-[300px] pointer-events-none"
@@ -590,8 +654,8 @@ export default function NordySection() {
 
               <div className="max-w-6xl w-full mx-auto">
                 <div className="text-center mb-10">
-                  <p className="font-body text-brand-yellow text-sm uppercase tracking-widest mb-3">Feito para o seu negócio</p>
-                  <h2 className="font-heading font-bold text-white leading-tight mb-3" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 3rem)' }}>
+                  <p data-nordy-item className="font-body text-brand-yellow text-sm uppercase tracking-widest mb-3">Feito para o seu negócio</p>
+                  <h2 data-nordy-item className="font-heading font-bold text-white leading-tight mb-3" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 3rem)' }}>
                     Não importa o segmento,<br />
                     <span className="gradient-text">o Nordy se adapta</span>
                   </h2>
@@ -602,6 +666,7 @@ export default function NordySection() {
                     const Icon = s.icon
                     return (
                       <div
+                        data-nordy-item
                         key={s.label}
                         className="group bg-brand-gray-mid border border-white/8 rounded-2xl p-4 text-center hover:border-brand-yellow/30 hover:bg-brand-gray-light transition-all duration-300"
                       >
@@ -616,7 +681,7 @@ export default function NordySection() {
                 </div>
 
                 {/* CTA strip */}
-                <div className="bg-brand-gray-mid border border-brand-yellow/20 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 yellow-glow">
+                <div data-nordy-item className="bg-brand-gray-mid border border-brand-yellow/20 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 yellow-glow">
                   <div>
                     <h3 className="font-heading font-bold text-white text-xl mb-1">
                       Pronto para ter o Nordy no seu negócio?

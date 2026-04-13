@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { animate, createTimeline, stagger } from 'animejs'
 
-// Total duration before splash exits: ~3000ms
 const BOOT_LINES = [
   'NORDEX_OS v2.4.1 — BOOT SEQUENCE',
   'Initializing core modules.............. OK',
@@ -11,14 +11,15 @@ const BOOT_LINES = [
 ]
 
 export default function SplashScreen({ onDone }) {
+  const rootRef = useRef(null)
   const canvasRef = useRef(null)
-  const [phase, setPhase] = useState('boot')   // boot → logo → exit
-  const [visibleLines, setVisibleLines] = useState([])
-  const [logoChars, setLogoChars] = useState('')
-  const [techChars, setTechChars] = useState('')
-  const [exiting, setExiting] = useState(false)
+  const lineRefs = useRef([])
+  const logoMainRef = useRef(null)
+  const logoTechRef = useRef(null)
+  const underlineRef = useRef(null)
+  const taglineRef = useRef(null)
+  const progressRef = useRef(null)
 
-  // ── Canvas grid / scan line ──────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -30,13 +31,10 @@ export default function SplashScreen({ onDone }) {
       canvas.width = canvas.offsetWidth
       canvas.height = canvas.offsetHeight
     }
-    resize()
-    window.addEventListener('resize', resize)
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // dot grid
       const spacing = 32
       for (let x = 0; x < canvas.width; x += spacing) {
         for (let y = 0; y < canvas.height; y += spacing) {
@@ -47,7 +45,6 @@ export default function SplashScreen({ onDone }) {
         }
       }
 
-      // horizontal scan line
       const grad = ctx.createLinearGradient(0, scanY - 60, 0, scanY + 60)
       grad.addColorStop(0, 'rgba(245,197,24,0)')
       grad.addColorStop(0.5, 'rgba(245,197,24,0.12)')
@@ -55,7 +52,6 @@ export default function SplashScreen({ onDone }) {
       ctx.fillStyle = grad
       ctx.fillRect(0, scanY - 60, canvas.width, 120)
 
-      // thin bright line
       ctx.beginPath()
       ctx.moveTo(0, scanY)
       ctx.lineTo(canvas.width, scanY)
@@ -68,7 +64,10 @@ export default function SplashScreen({ onDone }) {
 
       animId = requestAnimationFrame(draw)
     }
+
+    resize()
     draw()
+    window.addEventListener('resize', resize)
 
     return () => {
       cancelAnimationFrame(animId)
@@ -76,72 +75,83 @@ export default function SplashScreen({ onDone }) {
     }
   }, [])
 
-  // ── Boot log lines ───────────────────────────────────────
   useEffect(() => {
-    if (phase !== 'boot') return
-    let lineIdx = 0
-    const next = () => {
-      if (lineIdx < BOOT_LINES.length) {
-        setVisibleLines((prev) => [...prev, BOOT_LINES[lineIdx]])
-        lineIdx++
-        setTimeout(next, lineIdx === 1 ? 80 : 120)
-      } else {
-        // transition to logo phase
-        setTimeout(() => setPhase('logo'), 150)
-      }
-    }
-    const timer = setTimeout(next, 100)
-    return () => clearTimeout(timer)
-  }, [phase])
+    const root = rootRef.current
+    const logoMain = logoMainRef.current
+    const logoTech = logoTechRef.current
+    const underline = underlineRef.current
+    const tagline = taglineRef.current
+    const progress = progressRef.current
+    const bootLines = lineRefs.current.filter(Boolean)
 
-  // ── Logo typing ──────────────────────────────────────────
-  useEffect(() => {
-    if (phase !== 'logo') return
-    const word = 'NORDEX'
-    let i = 0
-    const id = setInterval(() => {
-      i++
-      setLogoChars(word.slice(0, i))
-      if (i >= word.length) {
-        clearInterval(id)
-        // type ".TECH" after short pause
-        setTimeout(() => {
-          const tech = '.TECH'
-          let j = 0
-          const id2 = setInterval(() => {
-            j++
-            setTechChars(tech.slice(0, j))
-            if (j >= tech.length) {
-              clearInterval(id2)
-              // start exit
-              setTimeout(() => {
-                setExiting(true)
-                setTimeout(onDone, 500)
-              }, 300)
-            }
-          }, 55)
-        }, 120)
-      }
-    }, 45)
-    return () => clearInterval(id)
-  }, [phase, onDone])
+    if (!root || !logoMain || !logoTech || !underline || !tagline || !progress || !bootLines.length) return
+
+    const timeline = createTimeline({
+      defaults: { ease: 'out(3)' },
+      onComplete: () => onDone(),
+    })
+
+    timeline
+      .add(bootLines, {
+        opacity: [0, 1],
+        x: ['-0.75rem', 0],
+        duration: 240,
+        delay: stagger(110),
+      })
+      .add(progress, {
+        width: ['0%', '58%'],
+        duration: 820,
+        ease: 'inOut(2)',
+      }, 0)
+      .add(logoMain, {
+        opacity: [0, 1],
+        clipPath: ['inset(0 100% 0 0)', 'inset(0 0% 0 0)'],
+        duration: 520,
+        ease: 'inOut(2)',
+      }, '+=60')
+      .add(logoTech, {
+        opacity: [0, 1],
+        clipPath: ['inset(0 100% 0 0)', 'inset(0 0% 0 0)'],
+        duration: 420,
+        ease: 'inOut(2)',
+      }, '-=140')
+      .add(underline, {
+        opacity: [0, 1],
+        scaleX: [0, 1],
+        duration: 360,
+      }, '-=120')
+      .add(tagline, {
+        opacity: [0, 1],
+        y: ['0.75rem', 0],
+        duration: 320,
+      }, '-=180')
+      .add(progress, {
+        width: ['58%', '100%'],
+        duration: 540,
+        ease: 'inOut(2)',
+      }, '-=320')
+      .add({}, { duration: 260 })
+      .add(root, {
+        opacity: [1, 0],
+        y: [0, -18],
+        scale: [1, 1.015],
+        duration: 520,
+        ease: 'inOut(2)',
+      })
+
+    return () => timeline.pause()
+  }, [onDone])
 
   return (
     <div
+      ref={rootRef}
       className="fixed inset-0 z-[100] flex flex-col bg-brand-black overflow-hidden"
-      style={{
-        transition: 'opacity 0.6s ease, transform 0.6s ease',
-        opacity: exiting ? 0 : 1,
-        transform: exiting ? 'translateY(-12px)' : 'translateY(0)',
-        pointerEvents: exiting ? 'none' : 'all',
-      }}
+      style={{ pointerEvents: 'all' }}
       aria-live="polite"
       aria-label="Carregando Nordex Tech"
     >
-      {/* Background canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" aria-hidden="true" />
 
-      {/* Vignette */}
       <div
         className="absolute inset-0 pointer-events-none"
         aria-hidden="true"
@@ -151,17 +161,12 @@ export default function SplashScreen({ onDone }) {
         }}
       />
 
-      {/* Boot log — bottom left */}
       <div className="absolute bottom-10 left-10 max-w-sm hidden md:block" aria-hidden="true">
-        {visibleLines.map((line, i) => (
+        {BOOT_LINES.map((line, i) => (
           <p
-            key={i}
-            className="font-mono text-xs leading-6 text-brand-yellow/40"
-            style={{
-              animation: 'fadeIn 0.2s ease forwards',
-              opacity: 0,
-              animationFillMode: 'forwards',
-            }}
+            key={line}
+            ref={(el) => { lineRefs.current[i] = el }}
+            className="font-mono text-xs leading-6 text-brand-yellow/40 opacity-0"
           >
             <span className="text-brand-yellow/20 mr-2">{String(i).padStart(2, '0')}</span>
             {line}
@@ -169,7 +174,6 @@ export default function SplashScreen({ onDone }) {
         ))}
       </div>
 
-      {/* Corner brackets */}
       {[
         'top-6 left-6 border-t border-l',
         'top-6 right-6 border-t border-r',
@@ -183,88 +187,59 @@ export default function SplashScreen({ onDone }) {
         />
       ))}
 
-      {/* Center logo */}
       <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-4">
-        {/* Main logo text */}
         <div className="relative">
           <h1
             className="font-heading font-bold tracking-tight leading-none select-none"
             style={{ fontSize: 'clamp(3rem, 10vw, 7rem)' }}
           >
             <span
-              className="text-white"
+              ref={logoMainRef}
+              className="text-white inline-block"
               style={{
-                textShadow:
-                  logoChars.length > 0
-                    ? '0 0 40px rgba(255,255,255,0.15)'
-                    : 'none',
+                opacity: 0,
+                clipPath: 'inset(0 100% 0 0)',
+                textShadow: '0 0 40px rgba(255,255,255,0.15)',
               }}
             >
-              {logoChars}
+              NORDEX
             </span>
             <span
-              className="gradient-text"
+              ref={logoTechRef}
+              className="gradient-text inline-block"
               style={{
-                textShadow:
-                  techChars.length > 0
-                    ? '0 0 40px rgba(245,197,24,0.4)'
-                    : 'none',
+                opacity: 0,
+                clipPath: 'inset(0 100% 0 0)',
+                textShadow: '0 0 40px rgba(245,197,24,0.4)',
               }}
             >
-              {techChars}
+              .TECH
             </span>
-            {/* blinking cursor */}
-            {phase === 'logo' && techChars.length < 5 && (
-              <span
-                className="inline-block w-[3px] bg-brand-yellow ml-1 align-middle"
-                style={{
-                  height: 'clamp(2.4rem, 8vw, 5.5rem)',
-                  animation: 'blink 0.7s step-end infinite',
-                }}
-                aria-hidden="true"
-              />
-            )}
           </h1>
 
-          {/* Underline sweep */}
-          {techChars.length === 5 && (
-            <div
-              className="absolute -bottom-2 left-0 h-0.5 bg-gradient-to-r from-brand-yellow via-brand-yellow-light to-transparent rounded-full"
-              style={{
-                animation: 'sweepIn 0.4s ease forwards',
-                width: 0,
-              }}
-            />
-          )}
+          <div
+            ref={underlineRef}
+            className="absolute -bottom-2 left-0 h-0.5 w-full bg-gradient-to-r from-brand-yellow via-brand-yellow-light to-transparent rounded-full origin-left"
+            style={{ opacity: 0, transform: 'scaleX(0)' }}
+          />
         </div>
 
-        {/* Tagline */}
-        {techChars.length === 5 && (
-          <p
-            className="font-body text-sm text-white/30 tracking-[0.3em] uppercase"
-            style={{ animation: 'fadeIn 0.4s ease 0.1s forwards', opacity: 0 }}
-          >
-            Tecnologia nordestina
-          </p>
-        )}
+        <p
+          ref={taglineRef}
+          className="font-body text-sm text-white/30 tracking-[0.3em] uppercase"
+          style={{ opacity: 0, transform: 'translateY(0.75rem)' }}
+        >
+          Tecnologia nordestina
+        </p>
 
-        {/* Progress bar */}
         <div className="mt-10 w-48 h-px bg-white/8 rounded-full overflow-hidden">
           <div
+            ref={progressRef}
             className="h-full bg-brand-yellow rounded-full"
-            style={{
-              transition: 'width 1.6s linear',
-              width: phase === 'boot' ? '60%' : '100%',
-            }}
+            style={{ width: '0%' }}
           />
         </div>
       </div>
-
-      <style>{`
-        @keyframes blink { 0%,100% { opacity: 1 } 50% { opacity: 0 } }
-        @keyframes sweepIn { from { width: 0 } to { width: 100% } }
-        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-      `}</style>
     </div>
   )
 }

@@ -9,8 +9,17 @@ import 'dotenv/config'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
 const PORT = 3001
+const DEV_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+|192\.168\.\d+\.\d+):5173$/
 
-app.use(cors({ origin: ['http://localhost:5173', 'https://nordex.tech'] }))
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin) return callback(null, true)
+    if (origin === 'https://nordex.tech' || DEV_ORIGIN.test(origin)) {
+      return callback(null, true)
+    }
+    return callback(new Error(`Origin not allowed by CORS: ${origin}`))
+  },
+}))
 app.use(express.json())
 
 // Load Nordy context once at startup
@@ -128,6 +137,6 @@ app.post('/api/chat', async (req, res) => {
   }
 })
 
-app.listen(PORT, () => {
-  console.log(`✅ API server running on http://localhost:${PORT}`)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ API server running on http://0.0.0.0:${PORT}`)
 })
