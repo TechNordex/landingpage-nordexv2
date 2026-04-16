@@ -100,19 +100,9 @@ export default function ProductDemo() {
                     </p>
                     {isActive && (
                       <div className="mt-3">
-                        <p className="font-body text-sm text-white/60 leading-relaxed mb-3">
+                        <p className="font-body text-sm text-white/60 leading-relaxed">
                           {p.description}
                         </p>
-                        <div className="flex flex-wrap gap-2">
-                          {p.tags.map((t) => (
-                            <span
-                              key={t}
-                              className="font-body text-xs bg-brand-yellow/10 text-brand-yellow border border-brand-yellow/20 rounded-full px-3 py-1"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                        </div>
                       </div>
                     )}
                   </div>
