@@ -10,12 +10,16 @@ const BOOT_LINES = [
   'Sincronizando canais de atendimento',
   'Sessão pronta',
 ]
-const CHAT_WIDTH = 360
-const CHAT_HEIGHT = 520
 const LAUNCHER_SIZE = 56
-const START_CLIP = `inset(${CHAT_HEIGHT - LAUNCHER_SIZE}px 0px 0px ${CHAT_WIDTH - LAUNCHER_SIZE}px round 24px)`
-const HORIZONTAL_CLIP = `inset(${CHAT_HEIGHT - LAUNCHER_SIZE}px 0px 0px 0px round 24px)`
-const FULL_CLIP = 'inset(0px 0px 0px 0px round 24px)'
+const DESKTOP_WIDTH = 360
+const DESKTOP_HEIGHT = 520
+
+function getClips(w, h) {
+  const start = `inset(${h - LAUNCHER_SIZE}px 0px 0px ${w - LAUNCHER_SIZE}px round 24px)`
+  const horizontal = `inset(${h - LAUNCHER_SIZE}px 0px 0px 0px round 24px)`
+  const full = 'inset(0px 0px 0px 0px round 24px)'
+  return { start, horizontal, full }
+}
 
 function parseMarkdown(text) {
   return text
@@ -36,18 +40,27 @@ export default function NordyChat() {
   const [pulse, setPulse] = useState(true)
   const [booting, setBooting] = useState(false)
   const [opening, setOpening] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
   const dialogRef = useRef(null)
   const triggerRef = useRef(null)
   const bootOverlayRef = useRef(null)
 
-  // Stop pulsing after first open
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  const chatWidth = isMobile ? window.innerWidth : DESKTOP_WIDTH
+  const chatHeight = isMobile ? window.innerHeight : DESKTOP_HEIGHT
+  const clips = getClips(chatWidth, chatHeight)
+
   useEffect(() => {
     if (open) setPulse(false)
   }, [open])
 
-  // Listen for external open trigger (e.g. from NordySection hint)
   useEffect(() => {
     const handler = () => {
       if (!open) {
@@ -59,17 +72,14 @@ export default function NordyChat() {
     return () => window.removeEventListener('nordy:open', handler)
   }, [open])
 
-  // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  // Focus input when opened
   useEffect(() => {
     if (open && !booting) setTimeout(() => inputRef.current?.focus(), 150)
   }, [open, booting])
 
-  // Opening animation
   useEffect(() => {
     if (!open) return
 
@@ -82,17 +92,8 @@ export default function NordyChat() {
 
     setBooting(true)
 
-    animate(trigger, {
-      scale: [1, 0.94, 1],
-      duration: 420,
-      ease: 'out(4)',
-    })
-
-    animate(dialog, {
-      opacity: [0, 1],
-      duration: 160,
-      ease: 'linear',
-    })
+    animate(trigger, { scale: [1, 0.94, 1], duration: 420, ease: 'out(4)' })
+    animate(dialog, { opacity: [0, 1], duration: 160, ease: 'linear' })
 
     if (bootOverlay) {
       const bootLines = bootOverlay.querySelectorAll('[data-boot-line]')
@@ -100,67 +101,28 @@ export default function NordyChat() {
       const bootMeta = bootOverlay.querySelector('[data-boot-meta]')
 
       const phaseOne = animate(dialog, {
-        clipPath: [START_CLIP, HORIZONTAL_CLIP],
+        clipPath: [clips.start, clips.horizontal],
         duration: 320,
         ease: 'inOut(2)',
       })
 
       const revealTimer = setTimeout(() => {
-        animate(dialog, {
-          clipPath: [HORIZONTAL_CLIP, FULL_CLIP],
-          duration: 430,
-          ease: 'out(3)',
-        })
-
-        animate(bootOverlay, {
-          opacity: [0, 1],
-          duration: 180,
-          ease: 'linear',
-        })
-
-        animate(bootLines, {
-          opacity: [0, 1],
-          x: ['-0.5rem', 0],
-          delay: stagger(150),
-          duration: 320,
-          ease: 'out(3)',
-        })
-
-        if (bootBar) {
-          animate(bootBar, {
-            width: ['0%', '100%'],
-            duration: 1100,
-            ease: 'inOut(2)',
-          })
-        }
-
-        if (bootMeta) {
-          animate(bootMeta, {
-            opacity: [0, 1],
-            delay: 620,
-            duration: 260,
-            ease: 'linear',
-          })
-        }
+        animate(dialog, { clipPath: [clips.horizontal, clips.full], duration: 430, ease: 'out(3)' })
+        animate(bootOverlay, { opacity: [0, 1], duration: 180, ease: 'linear' })
+        animate(bootLines, { opacity: [0, 1], x: ['-0.5rem', 0], delay: stagger(150), duration: 320, ease: 'out(3)' })
+        if (bootBar) animate(bootBar, { width: ['0%', '100%'], duration: 1100, ease: 'inOut(2)' })
+        if (bootMeta) animate(bootMeta, { opacity: [0, 1], delay: 620, duration: 260, ease: 'linear' })
       }, 300)
 
       const completeTimer = setTimeout(() => {
         setOpening(false)
-
         animate(bootOverlay, {
           opacity: [1, 0],
           duration: 220,
           ease: 'linear',
           onComplete: () => setBooting(false),
         })
-
-        animate(parts, {
-          opacity: [0, 1],
-          y: ['0.75rem', 0],
-          delay: stagger(60),
-          duration: 360,
-          ease: 'out(3)',
-        })
+        animate(parts, { opacity: [0, 1], y: ['0.75rem', 0], delay: stagger(60), duration: 360, ease: 'out(3)' })
       }, 1580)
 
       return () => {
@@ -220,11 +182,7 @@ export default function NordyChat() {
   const reset = () => setMessages([])
   const shellHidden = opening || booting
   const toggleOpen = () => {
-    if (open) {
-      setOpen(false)
-      return
-    }
-
+    if (open) { setOpen(false); return }
     setOpening(true)
     setOpen(true)
   }
@@ -237,19 +195,25 @@ export default function NordyChat() {
         role="dialog"
         aria-label="Chat com o Nordy"
         aria-hidden={!open}
-        className="fixed bottom-24 right-5 z-50 flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-brand-yellow/20"
+        className="fixed z-50 flex flex-col overflow-hidden shadow-2xl border border-brand-yellow/20"
         style={{
-          width: CHAT_WIDTH,
-          height: CHAT_HEIGHT,
+          width: isMobile ? '100vw' : DESKTOP_WIDTH,
+          height: isMobile ? '100dvh' : DESKTOP_HEIGHT,
+          bottom: isMobile ? 0 : '5.5rem',
+          right: isMobile ? 0 : '1.25rem',
+          left: isMobile ? 0 : 'auto',
+          top: isMobile ? 0 : 'auto',
+          borderRadius: isMobile ? '0' : '1.5rem',
           background: '#111111',
           transition: 'opacity 0.25s ease, transform 0.25s ease',
           opacity: open ? 1 : 0,
           transform: open ? 'translateY(0)' : 'translateY(16px)',
           pointerEvents: open ? 'all' : 'none',
           transformOrigin: 'bottom right',
-          clipPath: open ? (opening ? START_CLIP : FULL_CLIP) : START_CLIP,
+          clipPath: open ? (opening ? clips.start : clips.full) : clips.start,
         }}
       >
+        {/* Boot overlay */}
         <div
           ref={bootOverlayRef}
           className="absolute inset-0 z-10 px-5 py-5 flex flex-col justify-between pointer-events-none"
@@ -262,49 +226,34 @@ export default function NordyChat() {
           <div>
             <div className="flex items-center justify-between mb-5">
               <div>
-                <p className="font-heading font-bold text-brand-yellow text-sm tracking-[0.2em] uppercase">
-                  Nordy Boot
-                </p>
-                <p className="font-body text-white/35 text-[11px] mt-1">
-                  Sistema de atendimento inicializando
-                </p>
+                <p className="font-heading font-bold text-brand-yellow text-sm tracking-[0.2em] uppercase">Nordy Boot</p>
+                <p className="font-body text-white/35 text-[11px] mt-1">Sistema de atendimento inicializando</p>
               </div>
               <div className="w-10 h-10 rounded-2xl border border-brand-yellow/25 bg-brand-yellow/5 flex items-center justify-center">
                 <span className="font-heading text-brand-yellow text-xs">N</span>
               </div>
             </div>
-
             <div className="space-y-2">
               {BOOT_LINES.map((line, index) => (
                 <div key={line} data-boot-line className="flex items-center gap-2 opacity-0">
                   <span className={`w-1.5 h-1.5 rounded-full ${index === BOOT_LINES.length - 1 ? 'bg-brand-yellow' : 'bg-brand-yellow/55'}`} />
-                  <p className="font-body text-xs text-white/72 tracking-[0.08em] uppercase">
-                    {line}
-                  </p>
+                  <p className="font-body text-xs text-white/72 tracking-[0.08em] uppercase">{line}</p>
                 </div>
               ))}
             </div>
           </div>
-
           <div>
             <div className="h-px w-full bg-white/8 mb-3" />
             <div className="h-1.5 rounded-full bg-white/8 overflow-hidden">
               <div
                 data-boot-bar
                 className="h-full rounded-full"
-                style={{
-                  width: '0%',
-                  background: 'linear-gradient(90deg, rgba(245,197,24,0.35), rgba(245,197,24,1))',
-                }}
+                style={{ width: '0%', background: 'linear-gradient(90deg, rgba(245,197,24,0.35), rgba(245,197,24,1))' }}
               />
             </div>
             <div data-boot-meta className="opacity-0 flex items-center justify-between mt-3">
-              <p className="font-body text-[11px] text-white/30 tracking-[0.14em] uppercase">
-                Handshake seguro concluído
-              </p>
-              <p className="font-body text-[11px] text-brand-yellow/70 tracking-[0.18em] uppercase">
-                online
-              </p>
+              <p className="font-body text-[11px] text-white/30 tracking-[0.14em] uppercase">Handshake seguro concluído</p>
+              <p className="font-body text-[11px] text-brand-yellow/70 tracking-[0.18em] uppercase">online</p>
             </div>
           </div>
         </div>
@@ -313,10 +262,7 @@ export default function NordyChat() {
         <div
           data-chat-part
           className="flex items-center gap-3 px-4 py-3 border-b border-white/8 flex-shrink-0"
-          style={{
-            background: 'linear-gradient(135deg, #1A1A1A, #111)',
-            opacity: shellHidden ? 0 : undefined,
-          }}
+          style={{ background: 'linear-gradient(135deg, #1A1A1A, #111)', opacity: shellHidden ? 0 : undefined }}
         >
           <div className="relative">
             <img src={logo} alt="Nordy" className="w-9 h-9 rounded-xl object-contain bg-brand-black p-0.5" />
@@ -352,7 +298,6 @@ export default function NordyChat() {
           className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth"
           style={{ opacity: shellHidden ? 0 : undefined }}
         >
-          {/* Welcome bubble — always shown */}
           <div className="flex items-end gap-2">
             <div className="w-6 h-6 rounded-full bg-brand-yellow/20 flex-shrink-0 flex items-center justify-center mb-0.5">
               <span className="text-brand-yellow text-xs font-bold">N</span>
@@ -385,7 +330,6 @@ export default function NordyChat() {
             </div>
           ))}
 
-          {/* Typing indicator */}
           {loading && (
             <div className="flex items-end gap-2">
               <div className="w-6 h-6 rounded-full bg-brand-yellow/20 flex-shrink-0 flex items-center justify-center">
@@ -445,9 +389,7 @@ export default function NordyChat() {
         aria-label={open ? 'Fechar chat do Nordy' : 'Abrir chat do Nordy'}
         className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-2xl bg-brand-yellow flex items-center justify-center shadow-lg hover:bg-brand-yellow-light hover:scale-110 transition-all duration-200 cursor-pointer"
         style={{
-          boxShadow: pulse
-            ? '0 0 0 0 rgba(245,197,24,0.7)'
-            : '0 4px 20px rgba(245,197,24,0.4)',
+          boxShadow: pulse ? '0 0 0 0 rgba(245,197,24,0.7)' : '0 4px 20px rgba(245,197,24,0.4)',
           animation: pulse ? 'chatPulse 2s ease-in-out infinite' : 'none',
         }}
       >

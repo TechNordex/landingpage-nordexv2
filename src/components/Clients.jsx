@@ -7,7 +7,7 @@ const cases = [
   {
     logo: bibiscuit,
     name: 'Bi Biscuit',
-    segment: 'Confeitaria',
+    segment: 'Loja de Moldes',
     deliverable: 'Sistema de Gestão',
     description: 'Sistema de gestão de produção sob medida: controle de moldes, gestão de insumos e envio de relatórios automatizados via e-mail para uma das principais lojas de moldes para confeitaria do Nordeste.',
     url: 'https://bibiscuitaloja.com/',

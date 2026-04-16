@@ -198,10 +198,10 @@ export function NordyIntroHero({ layout = 'desktop' }) {
         >
           {['24/7', 'Sem fila', 'Resposta imediata', 'Multicanal'].map((chip, index) => {
             const desktopPositions = [
-              'left-[-0.6rem] top-[2rem]',
-              'right-[0.4rem] top-[-0.75rem]',
-              'left-[1.1rem] bottom-[0.9rem]',
-              'right-[-0.8rem] bottom-[1.4rem]',
+              'left-[-3rem] top-[2rem]',
+              'right-[-2.5rem] top-[-0.75rem]',
+              'left-[-5rem] bottom-[-1rem]',
+              'right-[-3rem] bottom-[1.4rem]',
             ]
 
             return (
