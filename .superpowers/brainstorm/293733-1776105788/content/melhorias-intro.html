@@ -1,0 +1,56 @@
+<h2>Melhorias para o NordyIntroHero</h2>
+<p class="subtitle">Escolha a(s) direção(ões) que mais faz sentido para o painel de métricas</p>
+
+<div class="options" data-multiselect>
+
+  <div class="option" data-choice="animacoes" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Animações nos números</h3>
+      <p>Os stats (<code>&lt; 2s</code>, <code>98%</code>, <code>24/7</code>) entram contando do zero quando o panel fica visível. O gráfico de barras cresce da base para cima com stagger. Ticker de "47 conversas" pulsa suavemente. Dá sensação de sistema vivo, não de print estático.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>A favor</h4><ul><li>Alto impacto visual sem mudar o layout</li><li>Reforça o "tempo real"</li></ul></div>
+        <div class="cons"><h4>Contra</h4><ul><li>Exige IntersectionObserver no panel</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="numero-hero" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Um número enorme em destaque</h3>
+      <p>Ao invés de três stats iguais em grid, um número dominante ocupa topo do card — ex.: <strong>"98%"</strong> em tipografia enorme — com label pequena embaixo. Os outros dois ficam secundários, menores, ao lado. Hierarquia visual clara: o usuário lê o impacto de um relance.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>A favor</h4><ul><li>Mais memorável e rápido de ler</li><li>Layout mais ousado e diferente de dashboards genéricos</li></ul></div>
+        <div class="cons"><h4>Contra</h4><ul><li>Requer escolher o número mais persuasivo</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="live-feed" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Live feed de atividade</h3>
+      <p>Substitui (ou complementa) o gráfico de barras por um feed de eventos rolando suavemente: <em>"Lead qualificado — WhatsApp"</em>, <em>"Agendamento confirmado — Site"</em>, <em>"FAQ respondido — Telegram"</em>. Mostra diversidade de uso e cria sensação de plataforma em operação contínua.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>A favor</h4><ul><li>Narrativo — conta o que o Nordy faz em loop</li><li>Mais próximo da realidade do produto</li></ul></div>
+        <div class="cons"><h4>Contra</h4><ul><li>Pode competir visualmente com o ticker de conversas ativas</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="copy" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Copy mais direto e vendedor</h3>
+      <p>O subtítulo atual <em>"Assistente de atendimento multicanal com orquestracao ativa"</em> é técnico demais para um hero. Trocar por algo mais simples e orientado ao benefício: <em>"Seu cliente atendido em segundos, a qualquer hora, em qualquer canal."</em> E o parágrafo embaixo pode reforçar o ROI: <em>"Enquanto sua equipe dorme, o Nordy continua convertendo."</em></p>
+      <div class="pros-cons">
+        <div class="pros"><h4>A favor</h4><ul><li>Muda o impacto sem tocar no código de UI</li><li>Melhora conversão — copy é o driver principal</li></ul></div>
+        <div class="cons"><h4>Contra</h4><ul><li>Nenhum</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:1.5rem">Pode selecionar mais de uma. Responde no terminal quando quiser avançar.</p>

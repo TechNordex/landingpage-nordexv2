@@ -1,11 +1,15 @@
-import { ArrowRight, CheckCircle2, Sparkles, Zap } from 'lucide-react'
+import { ArrowRight, Activity, Clock, Star, MessageSquare, TrendingUp, Zap } from 'lucide-react'
 
-const supportChips = ['24/7', 'Sem fila', 'Resposta imediata', 'Multicanal']
+const stats = [
+  { value: '< 2s', label: 'Tempo de resposta', icon: Clock, accent: '#F5C518' },
+  { value: '98%', label: 'Satisfação', icon: Star, accent: '#4ade80' },
+  { value: '24/7', label: 'Disponibilidade', icon: Activity, accent: '#60a5fa' },
+]
 
-const actionRows = [
-  'Triagem da conversa concluida',
-  'Lead salvo no funil comercial',
-  'Agenda confirmada com retorno automatico',
+const channels = [
+  { label: 'WhatsApp', color: '#25D366', count: '1.2k msgs/dia' },
+  { label: 'Telegram', color: '#2AABEE', count: '840 msgs/dia' },
+  { label: 'Site', color: '#F5C518', count: '630 msgs/dia' },
 ]
 
 export function NordyIntroHero({ layout = 'desktop' }) {
@@ -19,6 +23,7 @@ export function NordyIntroHero({ layout = 'desktop' }) {
           : 'grid grid-cols-[minmax(280px,0.74fr)_minmax(0,1fr)] gap-6 xl:gap-10 items-center'
       }`}
     >
+      {/* ── Left copy ── */}
       <div className="relative z-10">
         <div
           data-nordy-item
@@ -55,8 +60,7 @@ export function NordyIntroHero({ layout = 'desktop' }) {
             isMobile ? 'max-w-none text-base' : 'max-w-md text-lg'
           }`}
         >
-          Um hero de produto que mostra conversa, automacao e resultado em uma unica
-          cena, sem depender de uma grade de cards para explicar valor.
+          Seu negócio atendendo clientes em todos os canais, ao mesmo tempo, sem perder nenhuma conversa.
         </p>
 
         <a
@@ -69,102 +73,130 @@ export function NordyIntroHero({ layout = 'desktop' }) {
         </a>
       </div>
 
+      {/* ── Right visual — metrics dashboard ── */}
       <div data-nordy-item className="relative mx-auto w-full max-w-[620px] xl:max-w-[660px]">
         <div className="nordy-hero-glow absolute inset-[-10%] rounded-[2.5rem]" />
 
         <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#121212]/95 shadow-2xl">
+          {/* Header */}
           <div className="flex items-center justify-between border-b border-white/8 px-4 py-3.5 xl:px-5 xl:py-4">
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                <p className="font-heading text-sm font-semibold text-white">
-                  Nordy online
-                </p>
-              </div>
+              <p className="font-heading text-sm font-semibold text-white">Painel do Nordy</p>
               <p className="mt-1 font-body text-xs text-white/45">
-                Operando atendimento, qualificacao e agenda
+                Visao geral em tempo real
               </p>
             </div>
-
-            <div className="rounded-full border border-brand-yellow/20 bg-brand-yellow/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-brand-yellow">
-              Estado estavel
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="font-body text-xs text-green-300/80">Operando agora</span>
             </div>
           </div>
 
-          <div
-            className={`grid gap-4 p-4 ${
-              isMobile
-                ? 'grid-cols-1'
-                : 'grid-cols-[minmax(0,1fr)_minmax(240px,0.88fr)] xl:grid-cols-[minmax(0,1.04fr)_minmax(250px,0.9fr)] xl:p-5'
-            }`}
-          >
-            <div className="rounded-[1.5rem] border border-white/8 bg-brand-gray-dark/80 p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="font-body text-[11px] uppercase tracking-[0.22em] text-white/35">
-                  Conversa ativa
-                </span>
-                <Sparkles size={15} className="text-brand-yellow" />
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex justify-end">
-                  <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-brand-yellow/15 px-3 py-2 text-sm leading-snug text-white/90">
-                    Quero agendar para quinta e saber os valores.
+          <div className="p-4 xl:p-5 space-y-4">
+            {/* Stats row */}
+            <div className={`grid gap-3 ${isMobile ? 'grid-cols-3' : 'grid-cols-3'}`}>
+              {stats.map((s) => {
+                const Icon = s.icon
+                return (
+                  <div
+                    key={s.label}
+                    className="rounded-[1.25rem] border border-white/8 bg-brand-gray-dark/80 px-3 py-4 flex flex-col items-center text-center gap-1.5"
+                  >
+                    <div
+                      className="w-8 h-8 rounded-xl flex items-center justify-center mb-1"
+                      style={{ background: `${s.accent}18` }}
+                    >
+                      <Icon size={15} style={{ color: s.accent }} />
+                    </div>
+                    <p
+                      className="font-heading font-bold leading-none text-white"
+                      style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
+                    >
+                      {s.value}
+                    </p>
+                    <p className="font-body text-[10px] uppercase tracking-[0.16em] text-white/40 leading-tight">
+                      {s.label}
+                    </p>
                   </div>
-                </div>
-
-                <div className="flex justify-start">
-                  <div className="max-w-[88%] rounded-2xl rounded-tl-sm bg-brand-gray-light px-3 py-3 text-sm leading-snug text-white/80">
-                    Encontrei quinta, 10h. Reservei o horario, registrei o interesse
-                    comercial e enviei a confirmacao.
-                  </div>
-                </div>
-              </div>
+                )
+              })}
             </div>
 
-            <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="font-body text-[11px] uppercase tracking-[0.22em] text-white/35">
-                  Acoes em andamento
+            {/* Channels */}
+            <div className="rounded-[1.25rem] border border-white/8 bg-black/20 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-body text-[11px] uppercase tracking-[0.2em] text-white/35">
+                  Canais ativos
                 </span>
-                <Zap size={15} className="text-brand-yellow" />
+                <Zap size={14} className="text-brand-yellow" />
               </div>
-
-              <div className="space-y-2.5">
-                {actionRows.map((row) => (
-                  <div
-                    key={row}
-                    className="rounded-xl border border-brand-yellow/20 bg-brand-yellow/10 px-3 py-2.5"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <CheckCircle2 size={15} className="mt-0.5 text-brand-yellow" />
-                      <p className="font-body text-xs leading-snug text-white/80">{row}</p>
-                    </div>
+              <div className="space-y-2">
+                {channels.map((ch) => (
+                  <div key={ch.label} className="flex items-center gap-3">
+                    <span
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ background: ch.color }}
+                    />
+                    <span className="font-body text-sm text-white/75 flex-1">{ch.label}</span>
+                    <span className="font-body text-xs text-white/35">{ch.count}</span>
                   </div>
                 ))}
               </div>
+            </div>
 
-              <div className="mt-4 rounded-2xl border border-green-400/25 bg-green-400/10 px-4 py-3">
-                <p className="font-body text-[11px] uppercase tracking-[0.22em] text-green-300/80">
-                  Resultado
+            {/* Volume bar */}
+            <div className="rounded-[1.25rem] border border-white/8 bg-brand-gray-dark/80 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-body text-[11px] uppercase tracking-[0.2em] text-white/35">
+                  Volume de atendimentos hoje
+                </span>
+                <TrendingUp size={14} className="text-brand-yellow" />
+              </div>
+              <div className="flex items-end gap-1.5 h-12">
+                {[40, 55, 48, 70, 62, 80, 74, 90, 82, 95, 88, 76].map((h, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 rounded-sm"
+                    style={{
+                      height: `${h}%`,
+                      background:
+                        i === 11
+                          ? 'rgba(245,197,24,0.9)'
+                          : i >= 9
+                          ? 'rgba(245,197,24,0.45)'
+                          : 'rgba(255,255,255,0.1)',
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="font-body text-[10px] text-white/25">00h</span>
+                <span className="font-body text-[10px] text-white/25">agora</span>
+              </div>
+            </div>
+
+            {/* Active conversations ticker */}
+            <div className="flex items-center gap-3 rounded-2xl border border-brand-yellow/20 bg-brand-yellow/8 px-4 py-3">
+              <MessageSquare size={16} className="text-brand-yellow flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="font-body text-xs text-white/70 truncate">
+                  <span className="font-heading font-bold text-white">47</span> conversas ativas agora
                 </p>
-                <p className="mt-1 font-heading text-base font-semibold text-white">
-                  Lead captado
-                </p>
-                <p className="mt-1 font-body text-xs text-white/55">
-                  Agenda confirmada e contexto entregue ao time.
-                </p>
+              </div>
+              <div className="rounded-full bg-green-400/15 border border-green-400/25 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-green-300 whitespace-nowrap">
+                Ao vivo
               </div>
             </div>
           </div>
         </div>
 
+        {/* Floating chips */}
         <div
           className={`${
             isMobile ? 'mt-4 flex flex-wrap gap-2' : 'pointer-events-none absolute inset-0'
           }`}
         >
-          {supportChips.map((chip, index) => {
+          {['24/7', 'Sem fila', 'Resposta imediata', 'Multicanal'].map((chip, index) => {
             const desktopPositions = [
               'left-[-0.6rem] top-[2rem]',
               'right-[0.4rem] top-[-0.75rem]',
