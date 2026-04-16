@@ -315,7 +315,7 @@ export default function Hero() {
         <div className="inline-flex items-center gap-2 bg-brand-gray-mid border border-brand-yellow/20 rounded-full px-4 py-1.5 mb-8 animate-fade-in">
           <MapPin size={13} className="text-brand-yellow" />
           <span className="font-body text-xs text-white/60 tracking-wide uppercase">
-            Moreno, Pernambuco — Nordeste do Brasil
+            Moreno, Pernambuco | Nordeste do Brasil
           </span>
         </div>
 

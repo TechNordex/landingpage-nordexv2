@@ -33,7 +33,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-2 text-white/30">
               <MapPin size={13} className="text-brand-yellow" />
-              <span className="font-body text-xs">Moreno, Pernambuco — Brasil</span>
+              <span className="font-body text-xs">Moreno, Pernambuco | Brasil</span>
             </div>
           </div>
 

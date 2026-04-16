@@ -82,7 +82,7 @@ export default function Contact() {
               {
                 icon: MapPin,
                 label: 'Localização',
-                value: 'Moreno, Pernambuco — Brasil',
+                value: 'Moreno, Pernambuco | Brasil',
               },
               {
                 icon: Mail,

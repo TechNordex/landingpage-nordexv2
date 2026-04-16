@@ -65,7 +65,7 @@ export default function AboutUs() {
               negócio.
             </p>
             <a
-              href="#contact"
+              href="#team"
               className="reveal inline-flex items-center gap-2 bg-brand-yellow text-brand-black font-heading font-bold px-7 py-3.5 rounded-full hover:bg-brand-yellow-light transition-all duration-200 cursor-pointer hover:scale-105"
             >
               Conheça nosso time

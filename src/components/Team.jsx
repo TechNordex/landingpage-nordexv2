@@ -14,7 +14,7 @@ const team = [
   {
     initials: 'DS',
     name: 'Deyvid Silva',
-    role: 'Co-Founder & CTO',
+    role: 'Co-Founder & Head of AI',
     bio: 'Especialista em Inteligência Artificial e automação de fluxos. Responsável pela persistência, modelagem e integridade de dados das aplicações.',
     tags: ['IA', 'Automação', 'Dados'],
     color: '#FFD93D',
@@ -23,7 +23,7 @@ const team = [
   {
     initials: 'AV',
     name: 'Adson Vicente',
-    role: 'Co-Founder & CTO',
+    role: 'Co-Founder & Head of Infrastructure',
     bio: 'Gestor de Operações, Cloud e orquestração de serviços de deploy. Garante a alta disponibilidade, performance de rede e segurança da infraestrutura.',
     tags: ['Cloud', 'DevOps', 'Infra'],
     color: '#D4A017',
