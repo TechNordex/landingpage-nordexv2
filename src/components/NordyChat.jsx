@@ -151,6 +151,7 @@ export default function NordyChat() {
     const next = [...messages, userMsg]
     setMessages(next)
     setInput('')
+    if (inputRef.current) inputRef.current.style.height = 'auto'
     setLoading(true)
 
     try {
@@ -303,7 +304,8 @@ export default function NordyChat() {
               <span className="text-brand-yellow text-xs font-bold">N</span>
             </div>
             <div
-              className="max-w-[85%] bg-brand-gray-light rounded-2xl rounded-bl-sm px-3 py-2 font-body text-sm text-white/85 leading-snug"
+              className="max-w-[85%] min-w-0 bg-brand-gray-light rounded-2xl rounded-bl-sm px-3 py-2 font-body text-sm text-white/85 leading-snug break-words"
+              style={{ overflowWrap: 'anywhere' }}
               dangerouslySetInnerHTML={{ __html: parseMarkdown(WELCOME) }}
             />
           </div>
@@ -320,11 +322,12 @@ export default function NordyChat() {
                 </div>
               )}
               <div
-                className={`max-w-[85%] rounded-2xl px-3 py-2 font-body text-sm leading-snug ${
+                className={`max-w-[85%] min-w-0 rounded-2xl px-3 py-2 font-body text-sm leading-snug break-words ${
                   m.role === 'user'
                     ? 'bg-brand-yellow/20 text-white/90 rounded-br-sm'
                     : 'bg-brand-gray-light text-white/85 rounded-bl-sm'
                 }`}
+                style={{ overflowWrap: 'anywhere' }}
                 dangerouslySetInnerHTML={{ __html: parseMarkdown(m.content) }}
               />
             </div>
@@ -359,13 +362,17 @@ export default function NordyChat() {
             <textarea
               ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value)
+                e.target.style.height = 'auto'
+                e.target.style.height = `${e.target.scrollHeight}px`
+              }}
               onKeyDown={handleKey}
               placeholder="Escreva sua mensagem..."
               rows={1}
               aria-label="Mensagem para o Nordy"
-              className="flex-1 bg-transparent font-body text-sm text-white placeholder:text-white/25 resize-none focus:outline-none leading-snug max-h-28"
-              style={{ scrollbarWidth: 'none' }}
+              className="flex-1 bg-transparent font-body text-sm text-white placeholder:text-white/25 resize-none focus:outline-none leading-snug"
+              style={{ scrollbarWidth: 'none', maxHeight: '7rem', overflowY: 'auto' }}
             />
             <button
               onClick={sendMessage}
