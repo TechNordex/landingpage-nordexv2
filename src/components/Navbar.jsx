@@ -44,13 +44,23 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* CTA */}
-        <a
-          href="#contact"
-          className="hidden md:inline-flex items-center gap-2 bg-brand-yellow text-brand-black font-heading font-semibold text-sm px-5 py-2.5 rounded-full hover:bg-brand-yellow-light transition-colors duration-200 cursor-pointer"
-        >
-          Fale conosco
-        </a>
+        {/* CTAs */}
+        <div className="hidden md:flex items-center gap-3">
+          <a
+            href="https://portal.nordex.tech"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 border border-white/20 text-white/70 font-heading font-semibold text-sm px-5 py-2.5 rounded-full hover:border-brand-yellow/40 hover:text-brand-yellow transition-colors duration-200 cursor-pointer"
+          >
+            Portal do cliente
+          </a>
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 bg-brand-yellow text-brand-black font-heading font-semibold text-sm px-5 py-2.5 rounded-full hover:bg-brand-yellow-light transition-colors duration-200 cursor-pointer"
+          >
+            Fale conosco
+          </a>
+        </div>
 
         {/* Mobile toggle */}
         <button
@@ -80,9 +90,18 @@ export default function Navbar() {
             </a>
           ))}
           <a
+            href="https://portal.nordex.tech"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+            className="mt-2 border border-white/20 text-white/70 font-heading font-semibold text-sm px-5 py-3 rounded-full text-center hover:border-brand-yellow/40 hover:text-brand-yellow transition-colors duration-200 cursor-pointer"
+          >
+            Portal do cliente
+          </a>
+          <a
             href="#contact"
             onClick={() => setOpen(false)}
-            className="mt-2 bg-brand-yellow text-brand-black font-heading font-semibold text-sm px-5 py-3 rounded-full text-center hover:bg-brand-yellow-light transition-colors duration-200 cursor-pointer"
+            className="bg-brand-yellow text-brand-black font-heading font-semibold text-sm px-5 py-3 rounded-full text-center hover:bg-brand-yellow-light transition-colors duration-200 cursor-pointer"
           >
             Fale conosco
           </a>
