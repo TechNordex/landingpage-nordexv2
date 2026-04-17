@@ -394,8 +394,10 @@ export default function NordyChat() {
         ref={triggerRef}
         onClick={toggleOpen}
         aria-label={open ? 'Fechar chat do Nordy' : 'Abrir chat do Nordy'}
-        className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-2xl bg-brand-yellow flex items-center justify-center shadow-lg hover:bg-brand-yellow-light hover:scale-110 transition-all duration-200 cursor-pointer"
+        className="fixed z-50 w-14 h-14 rounded-2xl bg-brand-yellow flex items-center justify-center shadow-lg hover:bg-brand-yellow-light hover:scale-110 transition-all duration-200 cursor-pointer"
         style={{
+          bottom: 'max(1.25rem, env(safe-area-inset-bottom, 1.25rem))',
+          right: 'max(1.25rem, env(safe-area-inset-right, 1.25rem))',
           boxShadow: pulse ? '0 0 0 0 rgba(245,197,24,0.7)' : '0 4px 20px rgba(245,197,24,0.4)',
           animation: pulse ? 'chatPulse 2s ease-in-out infinite' : 'none',
         }}
