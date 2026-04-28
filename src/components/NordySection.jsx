@@ -21,6 +21,21 @@ import {
 import { NordyIntroHero } from './nordy/NordyIntroHero'
 
 const PANELS = 4 // number of horizontal panels
+const INTEGRATION_DEMO_TIMING = {
+  userDelay: 520,
+  stepsStartDelay: 1440,
+  stepInterval: 680,
+  assistantResponseGap: 440,
+  outcomeDelay: 840,
+  fadeUpAnimation: 'fadeUp 0.6s ease forwards',
+}
+const CHANNEL_RESULT_HOLD_MS = 2400
+const CHANNEL_CYCLE_INTERVAL_MS =
+  INTEGRATION_DEMO_TIMING.stepsStartDelay +
+  (4 * INTEGRATION_DEMO_TIMING.stepInterval) +
+  INTEGRATION_DEMO_TIMING.assistantResponseGap +
+  INTEGRATION_DEMO_TIMING.outcomeDelay +
+  CHANNEL_RESULT_HOLD_MS
 
 // ── Nordy hint with animated arrow ──────────────────────────
 function NordyHint() {
@@ -128,11 +143,14 @@ function IntegrationDemo({ channel }) {
     setShowOutcome(false)
 
     const timers = []
-    const userDelay = 260
-    const stepsStartDelay = 720
-    const stepInterval = 340
-    const assistantDelay = stepsStartDelay + (scenario.steps.length * stepInterval) + 220
-    const outcomeDelay = assistantDelay + 420
+    const {
+      userDelay,
+      stepsStartDelay,
+      stepInterval,
+      assistantResponseGap,
+      outcomeDelay,
+    } = INTEGRATION_DEMO_TIMING
+    const assistantDelay = stepsStartDelay + (scenario.steps.length * stepInterval) + assistantResponseGap
 
     timers.push(setTimeout(() => setShowUser(true), userDelay))
 
@@ -141,7 +159,7 @@ function IntegrationDemo({ channel }) {
     })
 
     timers.push(setTimeout(() => setShowAssistant(true), assistantDelay))
-    timers.push(setTimeout(() => setShowOutcome(true), outcomeDelay))
+    timers.push(setTimeout(() => setShowOutcome(true), assistantDelay + outcomeDelay))
 
     return () => timers.forEach(clearTimeout)
   }, [channel, scenario])
@@ -180,7 +198,7 @@ function IntegrationDemo({ channel }) {
 
             <div className="mt-auto space-y-2">
               {showUser && (
-                <div className="flex justify-end" style={{ animation: 'fadeUp 0.3s ease forwards' }}>
+                <div className="flex justify-end" style={{ animation: INTEGRATION_DEMO_TIMING.fadeUpAnimation }}>
                   <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-brand-yellow/20 px-3 py-2 text-xs font-body leading-snug text-white/90">
                     {scenario.userMessage}
                   </div>
@@ -188,7 +206,7 @@ function IntegrationDemo({ channel }) {
               )}
 
               {!showAssistant && showUser && (
-                <div className="flex justify-start" style={{ animation: 'fadeUp 0.3s ease forwards' }}>
+                <div className="flex justify-start" style={{ animation: INTEGRATION_DEMO_TIMING.fadeUpAnimation }}>
                   <div className="bg-brand-gray-light rounded-2xl rounded-tl-sm px-3 py-2 flex gap-1 items-center">
                     {[0, 1, 2].map((i) => (
                       <span
@@ -202,7 +220,7 @@ function IntegrationDemo({ channel }) {
               )}
 
               {showAssistant && (
-                <div className="flex justify-start" style={{ animation: 'fadeUp 0.3s ease forwards' }}>
+                <div className="flex justify-start" style={{ animation: INTEGRATION_DEMO_TIMING.fadeUpAnimation }}>
                   <div className="max-w-[88%] rounded-2xl rounded-tl-sm bg-brand-gray-light px-3 py-2 text-xs font-body leading-snug text-white/80">
                     {scenario.assistantMessage}
                   </div>
@@ -223,7 +241,7 @@ function IntegrationDemo({ channel }) {
                 return (
                   <div
                     key={stepLabel}
-                    className={`rounded-xl border px-3 py-2.5 transition-all duration-300 ${
+                    className={`rounded-xl border px-3 py-2.5 transition-all duration-[600ms] ${
                       completed
                         ? 'border-brand-yellow/30 bg-brand-yellow/10'
                         : 'border-white/8 bg-white/[0.02]'
@@ -249,7 +267,7 @@ function IntegrationDemo({ channel }) {
         </div>
 
         <div
-          className={`mt-4 rounded-2xl border px-4 py-3.5 transition-all duration-300 ${
+          className={`mt-4 rounded-2xl border px-4 py-3.5 transition-all duration-[600ms] ${
             showOutcome
               ? 'border-brand-yellow/30 bg-brand-yellow/10 opacity-100 translate-y-0'
               : 'border-white/8 bg-white/[0.02] opacity-40 translate-y-1'
@@ -318,7 +336,7 @@ export default function NordySection() {
         const i = channels.indexOf(c)
         return channels[(i + 1) % channels.length]
       })
-    }, 6000)
+    }, CHANNEL_CYCLE_INTERVAL_MS)
     return () => clearInterval(id)
   }, [])
 

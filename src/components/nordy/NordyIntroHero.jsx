@@ -65,7 +65,9 @@ export function NordyIntroHero({ layout = 'desktop' }) {
 
         <a
           data-nordy-item
-          href="#contact"
+          href="https://nordy.nordex.tech"
+          target="_blank"
+          rel="noopener noreferrer"
           className="yellow-glow mt-7 inline-flex items-center gap-2 rounded-full bg-brand-yellow px-7 py-4 font-heading font-bold text-brand-black transition-all duration-200 hover:bg-brand-yellow-light"
         >
           Quero o Nordy
